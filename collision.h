@@ -16,4 +16,5 @@
 #include <stdbool.h>
 #include "drawinglib.h"
 
-bool checkCollision(cardObject* card);
+int checkCollision(cardObject* card);
+void popUp(cardObject* trig, cardObject* card);
