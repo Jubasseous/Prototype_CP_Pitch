@@ -26,7 +26,8 @@ void drawRect(cardObject* rectObject, bool state)
 			rectObject->cornerRad
 		);
 		// Always clear the stroke and fill colors once the object has been drawn.
-		CP_Settings_NoStroke();
+		CP_Settings_Stroke(CP_Color_Create(0, 0, 0, 250));
+		//CP_Settings_NoStroke();
 		CP_Settings_NoFill();
 	}
 

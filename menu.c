@@ -18,27 +18,37 @@
 #include "collision.h"
 #include <stdlib.h>
 
+#define WINDOW_CENTERW CP_System_GetWindowWidth()/2.f;
+#define WINDOW_CENTERH CP_System_GetWindowHeight()/2.f;
+#define numOfCards 4
+
 CP_Color background;
 CP_Image xCard;
 CP_Image oCard;
 cardObject* startTrig;
 cardObject* start;
-//cardObject optionsTrig;
-//cardObject options;
-//cardObject creditTrig;
-//cardObject credit;
-//cardObject exitTrig;
-//cardObject exit;
-float posUp;
-float posDown;
-int Onstate;
-int Offstate;
-float originalPos;
-float time; 
+cardObject* optionsTrig;
+cardObject* options;
+//cardObject* creditTrig;
+//cardObject* credit;
+//cardObject* exitTrig;
+//cardObject* exit;
+//float posUp[numOfCards];
+//const float originalPos[numOfCards]; 
 bool inStart;
+float posUp;
+float originalPos;
+float ogHeight;
+float cardHeight;
+float changeTrig;
 
-#define WINDOW_CENTERW CP_System_GetWindowWidth()/2.f;
-#define WINDOW_CENTERH CP_System_GetWindowHeight()/2.f;
+float centerW;
+float centerH;
+
+
+
+
+
 
 
 
@@ -49,36 +59,72 @@ void menu_init(void)
 	CP_System_Fullscreen();
 
 	background = CP_Color_Create(100, 10, 200, 180);
+	centerW = CP_System_GetWindowWidth() / 2.f;
+	centerH = CP_System_GetWindowHeight() / 2.f;
 
 
 	//CP_Settings_RectMode(CP_POSITION_CENTER); 
 	CP_Settings_RectMode(CP_POSITION_CORNER);
 
-	startTrig = NEWCARDOBJECT;
-	if (!startTrig) return;
-	startTrig->x1 = WINDOW_CENTERW - 400.f;
-	startTrig->y1 = WINDOW_CENTERH - 200.f;
-	startTrig->width = 250.f;
-	startTrig->height = 500.f;
-	startTrig->degrees = 0.f;
-	//startTrig->color = CP_Color_Create(0, 150, 100, 255);
-	startTrig->color = CP_Color_Create(10, 10, 10, 0);
+	//for flat since their y1 is the same
+	originalPos = WINDOW_CENTERH - 200.f;
+	posUp = originalPos - 50.f;
 
-	start = NEWCARDOBJECT;
-	if (!start) return;
-	start->x1 = WINDOW_CENTERW - 400.f;
-	start->y1 = WINDOW_CENTERH - 200.f;
-	start->width = 250.f;
-	start->height = 500.f;
-	start->degrees = 0.f;
-	start->color = CP_Color_Create(0, 0, 100, 255);
+	{ //start card
+		startTrig = NEWCARDOBJECT;
+		if (!startTrig) return;
+		startTrig->x1 = 500.f;
+		startTrig->y1 = WINDOW_CENTERH - 200.f;
+		startTrig->width = 200.f;
+		startTrig->height = 300.f;
+		startTrig->degrees = 0.f;
+		startTrig->cornerRad = 25.f;
+		//startTrig->color = CP_Color_Create(0, 150, 100, 255);
+		startTrig->color = CP_Color_Create(10, 10, 10, 0);
 
-	originalPos = WINDOW_CENTERH - 200.f;;
-	posUp = originalPos - 100.f;
+		start = NEWCARDOBJECT;
+		if (!start) return;
+		start->x1 = 500.f;
+		start->y1 = WINDOW_CENTERH - 200.f;
+		start->width = 200.f;
+		start->height = 300.f;
+		start->degrees = 0.f;
+		start->cornerRad = 25.f;
+		start->color = CP_Color_Create(0, 0, 100, 255);
 
-	time = 0.f; 
+		
+	}
+	
+	{ //options
+		optionsTrig = NEWCARDOBJECT;
+		if (!optionsTrig) return;
+		optionsTrig->x1 = 550.f;
+		optionsTrig->y1 = WINDOW_CENTERH - 200.f;
+		optionsTrig->width = 200.f;
+		optionsTrig->height = 300.f;
+		optionsTrig->degrees = 20.f;
+		optionsTrig->cornerRad = 25.f;
+		optionsTrig->color = CP_Color_Create(0, 10, 10, 0);
 
+		options = NEWCARDOBJECT;
+		if (!options) return;
+		options->x1 = 550.f;
+		options->y1 = WINDOW_CENTERH - 200.f;
+		options->width = 200.f;
+		options->height = 300.f;
+		options->degrees = 20.f;
+		optionsTrig->cornerRad = 25.f;
+		options->color = CP_Color_Create(100, 0, 0, 255);
+	}
 
+	{ //for flat face
+		ogHeight = 300.f; //original height
+		cardHeight = ogHeight + 100.f; //bigger trigger size to account for not touching actual card
+		changeTrig = ogHeight - 50.f; //smaller than original to not glitch card
+	}
+	
+	scaleCardStraight(startTrig, start, 2);
+	
 
 
 
@@ -88,13 +134,21 @@ void menu_init(void)
 // this function will be called repeatedly every frame
 void menu_update(void)
 {
-	time += CP_System_GetDt();
+	char buffer[100];
+	CP_Settings_TextSize(200.f);
+	CP_Settings_Fill(CP_Color_Create(0, 0, 0, 250));
+	sprintf_s(buffer, sizeof(buffer), "Tic-Dec-Toe");
+	CP_Font_DrawText(buffer, centerW, centerH - 400.f);
+
 	// check input, update simulation, render etc.
 	CP_Graphics_ClearBackground(background);
 	drawRect(startTrig, 1);
 	drawRect(start, 1);
+	drawRect(optionsTrig, 1);
+	drawRect(options, 1);
 
-	if (checkCollision(startTrig))
+	popUpFlat(startTrig, start);
+	/*if (checkCollision(startTrig))
 	{
 			//startTrig->color = CP_Color_Create(500, 300, 150, 255);
 			startTrig->y1 = posUp;
@@ -142,7 +196,7 @@ void menu_update(void)
 
 		inStart = false;
 		
-	}
+	}*/
 	
 
 
@@ -155,4 +209,7 @@ void menu_exit(void)
 	// shut down the gamestate and cleanup any dynamic memory
 
 	free(startTrig);
+	free(start);
+	free(optionsTrig);
+	free(options);
 }

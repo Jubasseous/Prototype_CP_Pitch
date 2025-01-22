@@ -17,4 +17,7 @@
 #include "drawinglib.h"
 
 int checkCollision(cardObject* card);
-void popUp(cardObject* trig, cardObject* card);
+void popUpFlat(cardObject* trig, cardObject* card);
+void popUpDiagonal(cardObject* trig, cardObject* card, int i);
+void scaleCardStraight(cardObject* trig, cardObject* card, float scale);
+void scaleCardDiagonal(cardObject* trig, cardObject* card, float scale, int i );
